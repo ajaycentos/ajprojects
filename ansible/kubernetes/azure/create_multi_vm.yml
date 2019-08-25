@@ -1,0 +1,145 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Create a resource group
+      azure_rm_resourcegroup:
+        name: ajkube1
+        location: eastus
+
+    - name: Create virtual network
+      azure_rm_virtualnetwork:
+        resource_group: ajkube1
+        name: ajvn001
+        address_prefixes: "192.168.1.0/24"
+
+    - name: Add subnet
+      azure_rm_subnet:
+        resource_group: ajkube1
+        name: ajsubnet001
+        address_prefix: "192.168.1.0/24"
+        virtual_network: ajvn001
+###########################################################
+    - name: Create public ip
+      azure_rm_publicipaddress:
+        resource_group: ajkube1
+        allocation_method: Dynamic
+        name: "{{ item }}"
+      with_items:
+        - ajpubip001
+        - ajpubip002
+        - ajpubip003
+
+
+
+###################################################3
+
+    - name: Create NIC
+      azure_rm_networkinterface:
+        resource_group: ajkube1
+        name: ajnic1
+        virtual_network: ajvn001
+        subnet: ajsubnet001
+        private_ip_allocation_method: Static
+        private_ip_address: 192.168.1.10
+        public_ip_name: ajpubip001
+
+
+    - name: Create NIC
+      azure_rm_networkinterface:
+        resource_group: ajkube1
+        name: ajnic2
+        virtual_network: ajvn001
+        subnet: ajsubnet001
+        private_ip_allocation_method: Static
+        private_ip_address: 192.168.1.11
+        public_ip_name: ajpubip002
+
+
+
+    - name: Create NIC
+      azure_rm_networkinterface:
+        resource_group: ajkube1
+        name: ajnic3
+        virtual_network: ajvn001
+        subnet: ajsubnet001
+        private_ip_allocation_method: Static
+        private_ip_address: 192.168.1.12
+        public_ip_name: ajpubip003
+
+
+
+##############################################################
+    - name: Create VM
+      azure_rm_virtualmachine:
+        resource_group: ajkube1
+        name: ajvm001
+        vm_size: Standard_DS2_v2
+        ssh_password_enabled: no
+        admin_username: ajay
+        ssh_public_keys:
+          - path: /home/ajay/.ssh/authorized_keys
+            key_data: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDV+KiWVAyczYItZqhiclmxLBfCJq2jprbKol+98Ilp3w+HuxIlIJBy+8Aqz5eCA7KiCWeX/wmhjwmypzGTY9F05Ic97/6mY+8471aEtc4d9+9hCuYRjW//+YUl1/fn2GeOaZ1cy68VMGE6Fxx2xAIMcEE1QQ5kxwfAjU65rezbjtAWDolJHWUnWQX5IkibIdWjUKUJAemM4eri8/XHpI2RvCQlS6GUpHyYKECo7hBW6iy1cl6mgPYoqp5+9U8oGAvcuCiWJKlMtVvX3wXXS6flt15aNZ10Dz4rFzvJDYVqJgR1zd+pRkG6Yh6fnSbLeebFXx/j/+PeGKz65hIt6R/ vagrant@centos7.ajay.com
+        network_interfaces: ajnic1
+        image:
+          offer: CentOS
+          publisher: OpenLogic
+          sku: '7.5'
+          version: latest
+        tags:
+          env: uat
+          type: master
+
+    - name: Create VM
+      azure_rm_virtualmachine:
+        resource_group: ajkube1
+        name: ajvm002
+        vm_size: Standard_DS2_v2
+        ssh_password_enabled: no
+        admin_username: ajay
+        ssh_public_keys:
+          - path: /home/ajay/.ssh/authorized_keys
+            key_data: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDV+KiWVAyczYItZqhiclmxLBfCJq2jprbKol+98Ilp3w+HuxIlIJBy+8Aqz5eCA7KiCWeX/wmhjwmypzGTY9F05Ic97/6mY+8471aEtc4d9+9hCuYRjW//+YUl1/fn2GeOaZ1cy68VMGE6Fxx2xAIMcEE1QQ5kxwfAjU65rezbjtAWDolJHWUnWQX5IkibIdWjUKUJAemM4eri8/XHpI2RvCQlS6GUpHyYKECo7hBW6iy1cl6mgPYoqp5+9U8oGAvcuCiWJKlMtVvX3wXXS6flt15aNZ10Dz4rFzvJDYVqJgR1zd+pRkG6Yh6fnSbLeebFXx/j/+PeGKz65hIt6R/ vagrant@centos7.ajay.com
+        network_interfaces: ajnic2
+        image:
+          offer: CentOS
+          publisher: OpenLogic
+          sku: '7.5'
+          version: latest
+        tags:
+          env: uat
+          type: master
+
+    - name: Create VM
+      azure_rm_virtualmachine:
+        resource_group: ajkube1
+        name: ajvm003
+        vm_size: Standard_DS2_v2
+        ssh_password_enabled: no
+        admin_username: ajay
+        ssh_public_keys:
+          - path: /home/ajay/.ssh/authorized_keys
+            key_data: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDV+KiWVAyczYItZqhiclmxLBfCJq2jprbKol+98Ilp3w+HuxIlIJBy+8Aqz5eCA7KiCWeX/wmhjwmypzGTY9F05Ic97/6mY+8471aEtc4d9+9hCuYRjW//+YUl1/fn2GeOaZ1cy68VMGE6Fxx2xAIMcEE1QQ5kxwfAjU65rezbjtAWDolJHWUnWQX5IkibIdWjUKUJAemM4eri8/XHpI2RvCQlS6GUpHyYKECo7hBW6iy1cl6mgPYoqp5+9U8oGAvcuCiWJKlMtVvX3wXXS6flt15aNZ10Dz4rFzvJDYVqJgR1zd+pRkG6Yh6fnSbLeebFXx/j/+PeGKz65hIt6R/ vagrant@centos7.ajay.com
+        network_interfaces: ajnic3
+        image:
+          offer: CentOS
+          publisher: OpenLogic
+          sku: '7.5'
+          version: latest
+        tags:
+          env: uat
+          type: master
+
+
+################################################################
+    - name: Get facts for all Public IPs within a resource groups
+      azure_rm_publicipaddress_facts:
+        resource_group: ajkube1
+    - debug:
+        msg:
+          - "{{ ansible_facts.azure_publicipaddresses[0].name }}"
+          - "{{ ansible_facts.azure_publicipaddresses[0].properties.ipAddress }}"
+          - "{{ ansible_facts.azure_publicipaddresses[1].name }}"
+          - "{{ ansible_facts.azure_publicipaddresses[1].properties.ipAddress }}"
+          - "{{ ansible_facts.azure_publicipaddresses[2].name }}"
+          - "{{ ansible_facts.azure_publicipaddresses[2].properties.ipAddress }}"

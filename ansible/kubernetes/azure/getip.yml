@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Get facts for all Public IPs within a resource groups
+      azure_rm_publicipaddress_facts:
+        resource_group: ajkube1
+    - debug:
+        msg:
+          - "{{ ansible_facts.azure_publicipaddresses[0].name }}"
+          - "{{ ansible_facts.azure_publicipaddresses[0].properties.ipAddress }}"
+          - "{{ ansible_facts.azure_publicipaddresses[1].name }}"
+          - "{{ ansible_facts.azure_publicipaddresses[1].properties.ipAddress }}"

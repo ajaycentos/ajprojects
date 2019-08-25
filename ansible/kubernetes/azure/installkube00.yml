@@ -1,0 +1,143 @@
+---
+- name: Install Kubernets
+  hosts: type_master
+  become: yes
+  remote_user: ajay
+  tasks:
+
+    - name: Disable selinux
+      selinux:
+        state: disabled
+      notify: reboot server
+
+    - name: swap - remove current swaps from fstab
+      lineinfile:
+        dest: /etc/fstab
+        regexp: '^/[\S]+\s+none\s+swap '
+        state: absent
+
+
+    - name: swap - disable swap
+      command: swapoff --all
+
+    - name: Update sysctl settings for Kubernetes networking
+      copy:
+        dest: "/etc/sysctl.d/kubernetes.conf"
+        content: |
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.bridge.bridge-nf-call-iptables = 1
+    - name: Appy sysctl settings
+      command: sysctl --system
+
+    - name: Add Kubernetes repo
+      copy:
+        dest: /etc/yum.repos.d/kubernetes.repo
+        content: |
+          [kubernetes]
+          name=Kubernetes
+          baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+          enabled=1
+          gpgcheck=0
+          repo_gpgcheck=0
+          gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+          https://packages.cloud.google.com/yum/doc/rpm-packagekey.gpg
+
+    - name: Create Docker repository
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docer-ce.repo
+
+    - name: Install yum-utils etc
+      yum:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - yum-utils
+          - device-mapper-persistent-data
+          - lvm2
+          - docker-ce
+          - kubeadm
+          - kubelet
+          - kubectl
+
+    - name: Enable and start docker
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      with_items:
+          - docker
+          - kubelet
+  handlers:
+      - name: reboot server
+        reboot:
+
+- name: Initialize Kubernetes Cluster
+  hosts: ajvm001
+  remote_user: ajay
+  tags:
+   - check_init
+  tasks:
+    - name: Check if kubeadm already Initialized
+      shell: ps -ef|grep kube-apiserver |grep -v grep
+      register: kubeapi_process
+      ignore_errors: true
+      changed_when: false
+
+
+    - name: Init
+      become: yes
+      command: "kubeadm init --apiserver-advertise-address=192.168.1.10 --pod-network-cidr=10.244.0.0/16"
+      when: "kubeapi_process.stdout.find('kube-apiserver') == -1"
+
+
+    - name: Ensure config exists
+      file:
+        path: /home/ajay/.kube
+        state: directory
+
+
+    - name: Copy kube config
+      become: yes
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/ajay/.kube/config
+        owner: ajay
+        group: ajay
+        remote_src: yes
+      when: "kubeapi_process.stdout.find('kube-apiserver') == -1"
+
+    - name: Deploy flannel network
+      command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+      when: "kubeapi_process.stdout.find('kube-apiserver') == -1"
+
+
+    - name: Get token command
+      become: yes
+      command: kubeadm token create --print-join-command
+      register: kube_token
+      vars:
+        - token: kube_token.stdout_lines
+    - debug:
+       var: kube_token.stdout_lines[0]
+    - local_action: "copy content='{{ kube_token.stdout_lines[0]}}' dest=/tmp/kube_token.sh"
+
+
+- name: Add token
+  hosts: type_master:!ajvm001
+  remote_user: ajay
+  tags:
+    - addtoken
+  tasks:
+
+   - name: Check if kubelet process already Initialized
+     shell: ps -ef|grep kubelet |grep -v grep
+     register: kubelet_process
+     ignore_errors: true
+     changed_when: false
+
+   - name: Run script to add node to master
+     become: yes
+     script: /tmp/kube_token.sh
+     when: "kubelet_process.stdout.find('kubelet') == -1"
