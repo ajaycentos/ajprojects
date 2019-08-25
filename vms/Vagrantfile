@@ -1,0 +1,15 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "ajaycentos/centos7"
+  config.vm.hostname = 'utility.ajay.com'
+  #config.vm.box_url = "ubuntu/precise64"
+
+  config.vm.network :private_network, ip: "192.168.70.100"
+
+  config.vm.provider :virtualbox do |v|
+    v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    v.customize ["modifyvm", :id, "--memory", 512]
+    v.customize ["modifyvm", :id, "--name", "utility.ajay.com"]
+  end
+  config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  config.vm.synced_folder "c:/vms/data", "/data"
+end
