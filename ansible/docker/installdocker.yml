@@ -1,0 +1,9 @@
+---
+- name: Docker setup
+  hosts: docker_nodes
+  become: yes
+  vars:
+    myuser: "vagrant"
+  roles:
+    - docker
+  
