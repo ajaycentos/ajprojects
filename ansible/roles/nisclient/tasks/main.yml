@@ -1,0 +1,25 @@
+---
+- name: Install nis packages
+  package:
+    name: "{{ nis_client_package }}"
+    state: present
+  notify:
+    - start nis_client_daemons
+  
+- name: Update NIS domain in sysconfig/network file
+  lineinfile:
+    path: /etc/sysconfig/network
+    regexp: 'NISDOMAIN=.*'
+    line: 'NISDOMAIN={{ nis_domain }}'
+    backup: yes
+    insertbefore: EOF
+  notify:
+    - restart nis_client_daemons 
+
+- name: Enable the services
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  with_items: "{{ nis_client_daemons }}"
+

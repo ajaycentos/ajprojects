@@ -1,0 +1,6 @@
+- name: setup nisclient autofs
+  user: root
+  hosts: nis_client
+  roles:
+    - nisclient
+

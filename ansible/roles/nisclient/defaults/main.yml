@@ -1,14 +1,12 @@
 ---
-nis_package:
+nis_client_package:
  - ypserv
  - rpcbind
  - yp-tools
 
 nis_domain: ajay.lan
 
-nis_server_daemons:
+nis_client_daemons:
   - rpcbind 
   - ypserv 
-  - ypxfrd 
-  - yppasswdd
 

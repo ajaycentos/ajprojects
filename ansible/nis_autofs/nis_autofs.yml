@@ -1,8 +1,12 @@
 ---
-- name: setup nis autofs
+- name: setup nis server autofs
   user: root
-  hosts:
-          nis_master
+  hosts: nis_master
   roles:
           - nis
 
+- name: setup nisclient autofs
+  user: root
+  hosts: nis_client
+  roles:
+          - nisclient

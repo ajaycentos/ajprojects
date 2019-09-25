@@ -3,12 +3,14 @@
   package:
     name: "{{ nis_package }}"
     state: present
+  notify:
+    - start nis_server_daemons
   
 - name: Update NIS domain in sysconfig/network file
   lineinfile:
     path: /etc/sysconfig/network
     regexp: 'NISDOMAIN=.*'
-    line: 'NISDOMAIN=\"{{ nis_domain }}\"'
+    line: 'NISDOMAIN={{ nis_domain }}'
     backup: yes
     insertbefore: EOF
   notify:
