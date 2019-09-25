@@ -4,19 +4,31 @@
     name: "{{ nis_package }}"
     state: present
   
- - name: Update NIS domain in sysconfig/network file
-   lineinfile:
-     path: /etc/sysconfig/network
-     regexp: 'NISDOMAIN=.*'
-     line: 'NISDOMAIN=\"{{ nis_domain }}\"'
-     backup: yes
-     insertbefore: EOF
-    notify:
-      - restart "{{ nis_server_daemons }}" 
+- name: Update NIS domain in sysconfig/network file
+  lineinfile:
+    path: /etc/sysconfig/network
+    regexp: 'NISDOMAIN=.*'
+    line: 'NISDOMAIN=\"{{ nis_domain }}\"'
+    backup: yes
+    insertbefore: EOF
+  notify:
+    - restart nis_server_daemons 
 
-  - name: Enable the services
-    service:
-      name: "{{ nis_server_daemons }}"
-      enabled: yes
-      state: started
+- name: Enable the services
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  with_items: "{{ nis_server_daemons }}"
 
+- name: template in a patched ypinit script that has the ctrl d prompt disabled that creates /var/yp/.csc
+  template:
+    src: ypinit_csc.j2
+    dest: /usr/lib64/yp/ypinit_csc
+    mode: 0755
+    owner: root
+    group: root
+
+ 
+- name: initialize the master nis server with ypinit_csc if /var/yp/.csc does not exist
+  command: /usr/lib64/yp/ypinit_csc -m creates=/var/yp/.csc

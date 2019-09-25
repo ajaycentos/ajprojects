@@ -3,6 +3,6 @@
 
 - name: restart nis_server_daemons 
   service:
-    name: "{{ item }}"
+    name: "{{ nis_server_daemons }}"
     state: restarted
-  with_item: "{{ nis_server_daemons }}"
+    #  with_item: "{{ nis_server_daemons }}"

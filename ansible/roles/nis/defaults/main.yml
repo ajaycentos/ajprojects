@@ -2,6 +2,7 @@
 nis_package:
  - ypserv
  - rpcbind
+ - yp-tools
 
 nis_domain:
   - ajay.lan

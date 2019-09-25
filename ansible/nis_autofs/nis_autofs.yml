@@ -1,0 +1,8 @@
+---
+- name: setup nis autofs
+  user: root
+  hosts:
+          nis_master
+  roles:
+          - nis
+
