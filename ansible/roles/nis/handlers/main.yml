@@ -1,0 +1,8 @@
+---
+# handlers file for cscfi.nis
+
+- name: restart nis_server_daemons 
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_item: "{{ nis_server_daemons }}"

@@ -1,0 +1,14 @@
+---
+- name: Install nis packages
+  package:
+    name: "{{ nis_package }}"
+    state: "{{ nis_package_state }}"
+  
+ - name: Update NIS domain in sysconfig/network file
+   lineinfile:
+     dest=/etc/sysconfig/network
+     regexp='NISDOMAIN=.*'
+     line='NISDOMAIN=\"{{ nis_domain }}\"'
+     backup=yes
+     insertbefore=EOF
+
