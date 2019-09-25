@@ -3,6 +3,7 @@ nis_client_package:
  - ypserv
  - rpcbind
  - yp-tools
+ - authconfig 
 
 nis_domain: ajay.lan
 

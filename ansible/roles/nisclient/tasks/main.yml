@@ -6,6 +6,9 @@
   notify:
     - start nis_client_daemons
   
+- name: ypdomainname
+  command: 'ypdomainname {{ nis_domain }}'
+
 - name: Update NIS domain in sysconfig/network file
   lineinfile:
     path: /etc/sysconfig/network
@@ -16,10 +19,15 @@
   notify:
     - restart nis_client_daemons 
 
+
+
 - name: Enable the services
   service:
     name: "{{ item }}"
     enabled: yes
     state: started
   with_items: "{{ nis_client_daemons }}"
+
+- name: authconfig command
+  command: 'authconfig --enablenis --nisdomain=ajay.lan --nisserver=niss.ajay.lan --enablemkhomedir --update'
 
