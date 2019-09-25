@@ -1,0 +1,4 @@
+[type_master]
+ajvm001 ansible_host=104.45.137.246
+ajvm002 ansible_host=104.41.150.203
+ajvm003 ansible_host=137.116.127.85
