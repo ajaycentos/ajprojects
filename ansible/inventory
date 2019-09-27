@@ -2,7 +2,13 @@
 172.45.45.99
 
 [nis_master]
-10.67.211.72
+10.67.211.249
 
 [nis_client]
-10.67.211.73
+10.67.211.30
+
+[autofs_server:children]
+nis_master
+
+[autofs_client:children]
+nis_client
