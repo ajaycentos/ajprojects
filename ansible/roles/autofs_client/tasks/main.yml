@@ -1,0 +1,27 @@
+---
+- name: Install autofs client packages
+  package:
+    name: "{{ autofs_package }}"
+    state: present
+  notify:
+    - start server_daemons
+
+- name: create auto.master file
+  lineinfile:
+    path: /etc/auto.master
+    create: yes
+    line: '{{ path }} /etc/auto.home'
+  notify:
+    - restart server_daemons
+
+
+- name: create auto.home file
+  lineinfile:
+    path: /etc/auto.home
+    create: yes
+    line: '* -rw,soft {{ nfsserver }}:{{ path }}/&'
+  notify:
+     - restart server_daemons
+
+
+

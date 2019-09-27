@@ -1,0 +1,12 @@
+---
+- name: start server_daemons
+  service:
+          name: nfs
+          state: started
+          enabled: yes
+
+- name: restart server_daemons
+  service:
+          name: nfs
+          state: restarted
+

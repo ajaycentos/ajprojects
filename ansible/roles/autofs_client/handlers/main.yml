@@ -1,0 +1,11 @@
+---
+- name: start server_daemons
+  service:
+          name: autofs
+          state: started
+          enabled: yes
+- name: restart server_daemons
+  service:
+          name: autofs
+          state: restarted
+

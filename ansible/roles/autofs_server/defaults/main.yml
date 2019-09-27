@@ -1,0 +1,5 @@
+---
+nfs_package:
+        - nfs-utils
+
+path: /home

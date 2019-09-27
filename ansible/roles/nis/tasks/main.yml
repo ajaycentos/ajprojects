@@ -5,6 +5,9 @@
     state: present
   notify:
     - start nis_server_daemons
+
+- name: ypdomainname 
+  command: 'ypdomainname {{ nis_domain }}'
   
 - name: Update NIS domain in sysconfig/network file
   lineinfile:
@@ -34,3 +37,7 @@
  
 - name: initialize the master nis server with ypinit_csc if /var/yp/.csc does not exist
   command: /usr/lib64/yp/ypinit_csc -m creates=/var/yp/.csc
+
+- name: update database
+  command: "make -C /var/yp"
+

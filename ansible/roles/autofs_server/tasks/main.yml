@@ -1,0 +1,27 @@
+---
+- name: Install nfs server packages
+  package:
+    name: "{{ nfs_package }}"
+    state: present
+  notify:
+    - start server_daemons
+
+- name: Update exportfs file
+  lineinfile:
+    path: /etc/exports
+    line: '{{ path }} *(rw,sync)'
+    backup: yes
+    insertbefore: EOF
+  notify:
+    - restart server_daemons
+
+- name: Output exported directory
+  command: 'exportfs -av'
+  register: disp_exportfs
+
+- debug:
+        msg: "{{ disp_exportfs.stdout }}"   
+ 
+ 
+
+
