@@ -29,5 +29,6 @@
   with_items: "{{ nis_client_daemons }}"
 
 - name: authconfig command
-  command: 'authconfig --enablenis --nisdomain=ajay.lan --nisserver=niss.ajay.lan --enablemkhomedir --update'
-
+  command: 'authconfig --enablenis --nisdomain={{ nis_domain }} --nisserver={{ nis_server }} --enablemkhomedir --update'
+  notify:
+    - restart nis_client_daemons

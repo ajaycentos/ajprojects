@@ -2,10 +2,10 @@
 172.45.45.99
 
 [nis_master]
-10.67.211.249
+10.209.208.254
 
 [nis_client]
-10.67.211.30
+10.209.208.86
 
 [autofs_server:children]
 nis_master

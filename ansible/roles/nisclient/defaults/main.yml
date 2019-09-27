@@ -6,7 +6,7 @@ nis_client_package:
  - authconfig 
 
 nis_domain: ajay.lan
-
+nis_server: node1.ajay.lan
 nis_client_daemons:
   - rpcbind 
   - ypserv 

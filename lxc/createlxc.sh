@@ -15,7 +15,7 @@ do
 	ips=`lxc info node$i|grep eth0|grep -w inet|cut -f3`
 	echo $ips
 	sshpass -p 'q1w2e3/' scp -r ~/.ssh root@$ips:/root/
-        echo "$ips node$i.ajay.lan" >> /tmp/hosts.txt	
+        echo "$ips node$i.ajay.lan node$i" >> /tmp/hosts.txt	
 done
 
 for i in `seq 1 $count`

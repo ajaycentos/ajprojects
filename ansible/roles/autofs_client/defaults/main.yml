@@ -1,8 +1,9 @@
 ---
 autofs_package:
         - autofs
+        - nfs-utils
 
 path: /home
 
-nfsserver: niss.ajay.lan
+nfsserver: node1.ajay.lan
 
