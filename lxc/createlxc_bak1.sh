@@ -4,8 +4,6 @@
 # no of containers
 count=2
 
-rm -f /tmp/hosts.txt
-
 for i in `seq 1 $count`
 do
 	lxc launch images:centos/7 node$i --profile 512mb
@@ -14,8 +12,9 @@ do
 	echo "hostnamectl set-hostname node$i.ajay.lan"|lxc exec node$i bash
 	ips=`lxc info node$i|grep eth0|grep -w inet|cut -f3`
 	echo $ips
-	sshpass -p 'q1w2e3/' scp -r ~/.ssh root@$ips:/root/
-        echo "$ips node$i.ajay.lan" >> /tmp/hosts.txt	
+	ssh-copy-id root@$ips
+	scp ~/.ssh/id_rsa root@$ips:/root/.ssh 
+	echo "$ips node$i.ajay.lan" >> /tmp/hosts.txt	
 done
 
 for i in `seq 1 $count`
